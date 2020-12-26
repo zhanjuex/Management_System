@@ -1,0 +1,1033 @@
+附录：
+源代码（vs编译，devc++会报错：auto无法声明）
+#include "pch.h"
+#include <iostream>
+#include<string.h>
+#include <windows.h>
+#include <vector>
+#include<algorithm>
+#include <string>
+using namespace std;
+using std::vector;
+int Menu();
+void cinfo();
+void cprintorget();
+void sinfo();
+void sprintorget();
+char password[16] = "1234";
+
+//*****************************************************//类对象
+class info//信息类
+{
+protected:
+	long number;//编号
+	string name;//名称
+public:
+	info() {}
+	info(long num, string name) :number(num), name(name) {}
+};
+
+class course: public info//课程类
+{
+protected:
+	int credit;//学分
+	string teachername;//授课教师
+public:
+	course(){}
+	course(long num, string name, int cre, string tea) : info(num, name)
+	{
+		credit = cre;
+		teachername = tea;
+	}
+	course(const course &c1)
+	{
+		number = c1.number;
+		name = c1.name;
+		credit = c1.credit;
+		teachername = c1.teachername;
+	}
+	static void print();//输出数据
+	static void get();//获取数据
+	static void add();//增加数据
+	static void del();//删除数据
+	static void edit();//修改数据
+	static int ishave(long si);//查询是否有该课程
+	friend class student;
+};vector<course> c;
+
+class student: public info//学生类
+{
+protected:
+	string sex;//性别
+	string grade;//年级
+	long scredit;
+public:
+	vector<course> havec;//查询学生选课信息
+	student(){}
+	student(long num, string name, string se, string gra, long scr) : info(num, name)
+	{
+		sex = se;
+		grade = gra;
+		scredit = scr;
+	}
+	static void print();//输出数据
+	static void get();//获取数据
+	static void add();//增加数据
+	static void del();//删除数据
+	static void edit();//修改数据
+	static int ishave(long si);//查询是否有该学生
+	static void addcourse();// 为学生添加课程
+	static void delcourse();//为学生删除课程
+	static int ishavec(long si);//查询该学生是否有该课程
+};vector<student> s;
+
+//*****************************************************//课程类 类外实现
+void course::print()//打印所以课程信息 
+{
+	system("cls");
+
+	for (int i = 0; i < c.size(); i++)
+	{
+		cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
+		cout << endl << "课程编号：" << c[i].number << "   课程名称：" << c[i].name << "   课程学分：" \
+			<< c[i].credit << "   授课老师：" << c[i].teachername << endl;
+	}
+		
+	cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"<<endl;
+	cprintorget();
+}
+
+void course::get()//获得课程信息
+{
+	system("cls");
+	long k = 1,kk;
+	cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┃        请输入要查询的课程编号：      ┃" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	cin >> kk;
+	if (ishave(kk))
+	{
+		for (size_t i = 0; i < c.size(); i++)
+			if (c[i].number == kk)
+			{
+				cout << endl << "课程编号：" << c[i].number << "   课程名称：" << c[i].name << "   课程学分：" \
+					<< c[i].credit << "   授课老师：" << c[i].teachername << endl;
+				break;
+			}
+	}
+	else
+	{
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃              没有该课程 。           ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	}
+	cprintorget();
+}
+
+void course::add()
+{
+	system("cls");
+	long k = 1;course c1;
+	cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┃        请输入要添加的课程编号：      ┃" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	cin >> c1.number;
+	while (ishave(c1.number))
+	{
+
+		system("cls");
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃      该课程已添加，请重新输入：      ┃" << endl;
+		cout << "┃             （按0退出）              ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+		cin >> k;
+		if (k == 0)
+		{
+			cinfo();
+			break;
+		}
+		else c1.number = k;
+
+	}
+	if (k != 0)
+	{
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃           请输入课程名称：           ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+		cin >> c1.name;
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃           请输入课程学分：           ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+		cin >> c1.credit;
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃         请输入授课老师名称：         ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+		cin >> c1.teachername;
+		system("cls");
+		c.push_back(c1);
+		cinfo();
+	}
+}
+
+void course::del()//老师删除课程信息
+{
+	system("cls");
+	long k = 1, kk;
+	cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┃        请输入要删除的课程编号：      ┃" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	cin >> kk;
+	if (ishave(kk))
+	{
+		for (auto p = c.begin(); p != c.end();)
+		{
+			if (p->number == kk)
+			{
+				p = c.erase(p);
+				break;
+			}
+			else
+				++p;
+		}
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃            成功删除该课程。          ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	}
+	else
+	{
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃          你还没有添加该课程 。       ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	}
+}
+
+void course::edit()//老师修改课程信息
+{
+	system("cls");
+	long k = 1, kk;
+	cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┃      请输入要修改课程的课程编号：    ┃" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	cin >> kk;
+	if (ishave(kk))
+	{
+		for (size_t i = 0; i < c.size(); i++)
+		{
+			if (c[i].number == kk)
+			{
+				system("cls");
+				cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┃         请重新输入课程名称：         ┃" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+				cin >> c[i].name;
+				cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┃         请重新输入课程学分：         ┃" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+				cin >> c[i].credit;
+				cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┃       请重新输入授课老师名称：       ┃" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+				cin >> c[i].teachername;
+				cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┃              修改成功。              ┃" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+				break;
+			}
+		}
+	}
+	else
+	{
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃              没有该课程 。           ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	}
+
+}
+
+int course::ishave(long si)//查询是否有该课程
+{
+	for (size_t i = 0; i < c.size(); i++)
+		if (c[i].number == si)
+			return true;
+	return false;
+}
+//*****************************************************//学生类 类外实现
+void student::print()//打印所有学生信息
+{
+	long sumk = 0;
+	system("cls");
+	for (int i = 0; i < s.size(); i++)
+	{
+		sumk = 0;
+		cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
+		cout << endl << "学生学号：" << s[i].number << "   姓名：" << s[i].name << "   性别：" \
+			<< s[i].sex << "   年级：" << s[i].grade << endl << endl\
+			<< "学生已选课程：" << endl;
+		if (s[i].havec.size() == 0)
+		{
+			cout << "无" << endl;
+			continue;
+		}
+		else 
+		{
+			for (int k = 0; k < s[i].havec.size(); k++)
+			{
+				cout << endl << "课程编号：" << s[i].havec[k].number << "   课程名称：" << s[i].havec[k].name << "   课程学分：" \
+					<< s[i].havec[k].credit << "   授课老师：" << s[i].havec[k].teachername << endl;
+				sumk = sumk + s[i].havec[k].credit;
+			
+			}
+			cout<<endl<<"该学生本学期共有"<<s[i].scredit<<"学分，已选" << s[i].havec.size() << "门，共" << sumk << "学分。" << endl;
+		}
+	}cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
+	sprintorget();
+}
+
+void student::get()//获取学生信息
+{
+	system("cls");
+	long k = 1, kk, sumk =0 ;
+	cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┃        请输入要查询的学生学号：      ┃" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	cin >> kk;
+	system("cls");
+	if (ishave(kk))
+	{
+		for (size_t i = 0; i < s.size(); i++)
+			if (s[i].number == kk)
+			{
+				cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
+				cout << endl << "学生学号：" << s[i].number << "   姓名：" << s[i].name << "   性别：" \
+					<< s[i].sex << "   年级：" << s[i].grade << endl << endl\
+					<< "学生已选课程：" << endl;
+				if (s[i].havec.size() == 0)
+				{
+					cout << "无" << endl;
+					continue;
+				}
+				else
+				{
+					for (int k = 0; k < s[i].havec.size(); k++)
+					{
+						cout << endl << "课程编号：" << s[i].havec[k].number << "   课程名称：" << s[i].havec[k].name << "   课程学分：" \
+							<< s[i].havec[k].credit << "   授课老师：" << s[i].havec[k].teachername << endl;
+						sumk = sumk + s[i].havec[k].credit;
+
+					}
+					cout << endl << "该学生本学期共有" << s[i].scredit << "学分，已选" << s[i].havec.size() << "门，共" << sumk << "学分。" << endl;
+					cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
+				}
+			}
+	}
+	else
+	{
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃              没有该学生。            ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	}
+	sprintorget();
+}
+
+void student::add()//添加学生信息
+{
+	system("cls");
+	long k = 1;student s1;
+	cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┃        请输入要添加的学生学号：      ┃" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	cin >> s1.number;
+	while (ishave(s1.number))
+	{
+
+		system("cls");
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃      该学生已添加，请重新输入：      ┃" << endl;
+		cout << "┃             （按0退出）              ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+		cin >> k;
+		if (k == 0)
+		{
+			sinfo();
+			break;
+		}
+		else s1.number = k;
+
+	}
+	if (k != 0)
+	{
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃           请输入学生姓名：           ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+		cin >> s1.name;
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃           请输入学生性别：           ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+		cin >> s1.sex;
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃           请输入学生年级：           ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+		cin >> s1.grade;
+		system("cls");
+		s.push_back(s1);
+		sinfo();
+	}
+}
+
+void student::del()    //删除学生信息
+{
+	system("cls");
+	long k = 1, kk;
+	cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┃        请输入要删除的学生学号：      ┃" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	cin >> kk;
+	if (ishave(kk))
+	{
+		for (auto p = s.begin(); p != s.end();)
+		{
+			if (p->number == kk)
+			{
+				p = s.erase(p);
+				break;
+			}
+			else
+				++p;
+		}
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃            成功删除该学生：          ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	}
+	else
+	{
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃          你还没有添加该学生 。       ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	}
+}
+
+void student::edit()
+{
+	system("cls");
+	long k = 1, kk;
+	cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┃        请输入要修改学生的学号：      ┃" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	cin >> kk;
+	if (ishave(kk))
+	{
+		for (size_t i = 0; i < s.size(); i++)
+		{
+			if (s[i].number == kk)
+			{
+				system("cls");
+				cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┃         请重新输入学生姓名：         ┃" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+				cin >> s[i].name;
+				cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┃         请重新输入学生性别：         ┃" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+				cin >> s[i].sex;
+				cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┃         请重新输入学生年级：         ┃" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+				cin >> s[i].grade;
+				cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┃              修改成功。              ┃" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+				break;
+			}
+		}
+	}
+	else
+	{
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃              没有该学生。            ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	}
+}
+
+void student::addcourse()
+{
+	system("cls");
+	long k = 1, kk, sumk = 0, sk;
+	cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┃           请输入学生的学号：         ┃" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	cin >> kk;
+	if (ishave(kk))
+	{
+		for (size_t i = 0; i < s.size(); i++)
+		{
+			if (s[i].number == kk)
+			{
+				cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
+				cout << endl << "学生学号：" << s[i].number << "   姓名：" << s[i].name << "   性别：" \
+					<< s[i].sex << "   年级：" << s[i].grade << endl << endl\
+					<< "学生已选课程：" << endl;
+				if (s[i].havec.size() == 0)
+				{
+					cout << "无" << endl;
+					continue;
+				}
+				else
+				{
+					for (int k = 0; k < s[i].havec.size(); k++)
+					{
+						cout << endl << "课程编号：" << s[i].havec[k].number << "   课程名称：" << s[i].havec[k].name << "   课程学分：" \
+							<< s[i].havec[k].credit << "   授课老师：" << s[i].havec[k].teachername << endl;
+						sumk = sumk + s[i].havec[k].credit;
+
+					}
+					cout << endl << "该学生本学期共有" << s[i].scredit << "学分，已选" << s[i].havec.size() << "门，共" << sumk << "学分。" << endl;
+					cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
+				}
+				cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┃          请输入要添加的课程：        ┃" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+				cin >> sk;
+				for (size_t k = 0; k < s[i].havec.size(); k++)
+					if (s[i].havec[k].number == sk)
+					{
+						cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+						cout << "┃                                      ┃" << endl;
+						cout << "┃         已有该课程，无法添加。       ┃" << endl;
+						cout << "┃                                      ┃" << endl;
+						cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+					}
+					else
+					{
+						if (course::ishave(sk))
+						{
+							course c1;
+							for (size_t jk = 0; jk < c.size(); jk++)
+							{
+								if (c[jk].number == sk)
+								{
+									c1.number = c[jk].number;
+									c1.name = c[jk].name;
+									c1.credit = c[jk].credit;
+									c1.teachername = c[jk].teachername;
+								}
+							}
+								sumk = sumk + c1.credit;
+								if (sumk > s[i].scredit)
+								{
+									cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+									cout << "┃                                      ┃" << endl;
+									cout << "┃          学分不足，无法添加。        ┃" << endl;
+									cout << "┃                                      ┃" << endl;
+									cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+								}
+								else
+								{
+									s[i].havec.push_back(c1);
+									cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+									cout << "┃                                      ┃" << endl;
+									cout << "┃               添加成功。             ┃" << endl;
+									cout << "┃                                      ┃" << endl;
+									cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+									break;
+								}
+
+							
+						}
+						else
+						{
+							cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+							cout << "┃                                      ┃" << endl;
+							cout << "┃           系统内没有该课程 。        ┃" << endl;
+							cout << "┃                                      ┃" << endl;
+							cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+						}
+					}
+				
+			}
+		}
+	}
+	else
+	{
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃              没有该学生。            ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	}
+}
+
+void student::delcourse()
+{
+	system("cls");
+	long k = 1, kk, sumk = 0, sk;
+	cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┃           请输入学生的学号：         ┃" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	cin >> kk;
+	if (ishave(kk))
+	{
+		for (size_t i = 0; i < s.size(); i++)
+		{
+			if (s[i].number == kk)
+			{
+				cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
+				cout << endl << "学生学号：" << s[i].number << "   姓名：" << s[i].name << "   性别：" \
+					<< s[i].sex << "   年级：" << s[i].grade << endl << endl\
+					<< "学生已选课程：" << endl;
+				if (s[i].havec.size() == 0)
+				{
+					cout << "无" << endl;
+					continue;
+				}
+				else
+				{
+					for (int k = 0; k < s[i].havec.size(); k++)
+					{
+						cout << endl << "课程编号：" << s[i].havec[k].number << "   课程名称：" << s[i].havec[k].name << "   课程学分：" \
+							<< s[i].havec[k].credit << "   授课老师：" << s[i].havec[k].teachername << endl;
+						sumk = sumk + s[i].havec[k].credit;
+
+					}
+					cout << endl << "该学生本学期共有" << s[i].scredit << "学分，已选" << s[i].havec.size() << "门，共" << sumk << "学分。" << endl;
+					cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
+				}
+				cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┃          请输入要删除的课程：        ┃" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+				cin >> sk;	
+				for (auto p = s[i].havec.begin(); p != s[i].havec.end();)
+				{
+					if (p->number == sk)
+					{
+						p = s[i].havec.erase(p);
+						break;
+					}
+					else
+						++p;
+				}
+				cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┃               删除成功。             ┃" << endl;
+				cout << "┃                                      ┃" << endl;
+				cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+			}
+		}
+	}
+	else
+	{
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃              没有该学生。            ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	}
+}
+
+int student::ishave(long si)
+{
+	for (size_t i = 0; i < s.size(); i++)
+		if (s[i].number == si)
+			return true;
+	return false;
+}
+
+//*****************************************************//功能开发
+
+void cprintorget()//查询或展示课程信息
+{
+	cout << endl;
+	cout << "      **学生选课信息管理系统**   " << endl;
+	cout << "      ┏━━━━━━━━━━━━━━━━━━━━━┓   " << endl;
+	cout << "      ┃ 请选择功能：        ┃   " << endl;
+	cout << "      ┃ 1.查询课程信息      ┃  " << endl;
+	cout << "      ┃ 2.展示课程信息      ┃  " << endl;
+	cout << "      ┃ 3.回到上一页        ┃  " << endl;
+	cout << "      ┗━━━━━━━━━━━━━━━━━━━━━┛   " << endl;
+	cout << "      请输入序号（1~3）进入系统操作:  " << endl;
+	cout << endl;
+	int ii, k = 1;
+	cin >> ii;
+	while (k)
+	{
+		if (ii > 3 || ii < 1)
+		{
+			cout << "输入错误，请重新输入数字1~3。" << endl;
+			cin >> ii;
+		}
+
+		else
+			k = 0;
+	}
+system("cls");
+	switch (ii)
+	{
+	case 1: course::get();break;
+	case 2: course::print();break;
+	case 3:cinfo();break;
+	}
+}
+
+void cinfo()
+{
+	system("cls");
+	cout << endl;
+	cout << "      **学生选课信息管理系统**   " << endl;
+	cout << "      ┏━━━━━━━━━━━━━━━━━━━━━┓   " << endl;
+	cout << "      ┃ 请选择功能：        ┃   " << endl;
+	cout << "      ┃ 1.查询课程信息      ┃  " << endl;
+	cout << "      ┃ 2.录入课程信息      ┃  " << endl;
+	cout << "      ┃ 3.删除课程信息      ┃  " << endl;
+	cout << "      ┃ 4.修改课程信息      ┃  " << endl;
+	cout << "      ┃ 5.回到主菜单        ┃  " << endl;
+	cout << "      ┗━━━━━━━━━━━━━━━━━━━━━┛   " << endl;
+	cout << "      请输入序号（1~5）进入系统操作:  " << endl;
+	cout << endl;
+
+	int ii, k = 1;
+	cin >> ii;
+	while (k)
+	{
+		if (ii > 5 || ii < 1)
+		{
+			cout << "输入错误，请重新输入数字1~5。" << endl;
+			cin >> ii;
+		}
+
+		else
+			k = 0;
+	}
+	system("cls");
+	switch (ii)
+	{
+	case 1: cprintorget();break;
+	case 2:course::add();break;
+	case 3:course::del();break;
+	case 4:course::edit();break;
+	case 5:Menu();break;
+	}
+}
+
+void sprintorget()//查询或展示学生信息
+{
+	cout << endl;
+	cout << "      **学生选课信息管理系统**   " << endl;
+	cout << "      ┏━━━━━━━━━━━━━━━━━━━━━┓   " << endl;
+	cout << "      ┃ 请选择功能：        ┃   " << endl;
+	cout << "      ┃ 1.查询学生信息      ┃  " << endl;
+	cout << "      ┃ 2.展示学生信息      ┃  " << endl;
+	cout << "      ┃ 3.回到上一页        ┃  " << endl;
+	cout << "      ┗━━━━━━━━━━━━━━━━━━━━━┛   " << endl;
+	cout << "      请输入序号（1~3）进入系统操作:  " << endl;
+	cout << endl;
+	int ii, k = 1;
+	cin >> ii;
+	while (k)
+	{
+		if (ii > 3 || ii < 1)
+		{
+			cout << "输入错误，请重新输入数字1~3。" << endl;
+			cin >> ii;
+		}
+
+		else
+			k = 0;
+	}
+	system("cls");
+	switch (ii)
+	{
+	case 1: student::get();break;
+	case 2: student::print();break;
+	case 3:sinfo();break;
+	}
+}
+
+void sinfo() 
+{
+	system("cls");
+	cout << endl;
+	cout << "      **学生选课信息管理系统**   " << endl;
+	cout << "      ┏━━━━━━━━━━━━━━━━━━━━━┓   " << endl;
+	cout << "      ┃ 请选择功能：        ┃   " << endl;
+	cout << "      ┃ 1.查询学生信息      ┃  " << endl;
+	cout << "      ┃ 2.录入学生信息      ┃  " << endl;
+	cout << "      ┃ 3.删除学生信息      ┃  " << endl;
+	cout << "      ┃ 4.修改学生信息      ┃  " << endl;
+	cout << "      ┃ 5.为学生添加课程    ┃  " << endl;
+	cout << "      ┃ 6.为学生删除课程    ┃  " << endl;
+	cout << "      ┃ 7.回到主菜单        ┃  " << endl;
+	cout << "      ┗━━━━━━━━━━━━━━━━━━━━━┛   " << endl;
+	cout << "      请输入序号（1~7）进入系统操作:  " << endl;
+	cout << endl;
+
+	int ii, k = 1;
+	cin >> ii;
+	while (k)
+	{
+		if (ii > 7 || ii < 1)
+		{
+			cout << "输入错误，请重新输入数字1~7。" << endl;
+			cin >> ii;
+		}
+
+		else
+			k = 0;
+	}
+	system("cls");
+	switch (ii)
+	{
+	case 1: sprintorget();break;
+	case 2:student::add();break;
+	case 3:student::del();break;
+	case 4:student::edit();break;
+	case 5:student::addcourse();break;
+	case 6:student::delcourse();break;
+	case 7:Menu();break;
+	}
+}
+
+void login()//登录界面
+{
+	cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┃欢迎您使用学生选课信息管理系统管理端！┃" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┃    请输入密码：（默认密码：1234）    ┃" << endl;
+	cout << "┃                                      ┃" << endl;
+	cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	int k = 0;
+	char input[16];
+	cin >> input;
+	while (strcmp(password, input) != 0)
+	{
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃        密码错误，请重新输入。        ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+		cin >> input;
+		k++;
+
+		if (k > 3)
+		{
+			cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+			cout << "┃                                      ┃" << endl;
+			cout << "┃    输入错误超过5次，暂停操作5秒。    ┃" << endl;
+			cout << "┃                                      ┃" << endl;
+			cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+			Sleep(5000);
+			k = 0;
+			system("cls");
+			cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+			cout << "┃                                      ┃" << endl;
+			cout << "┃             请重新输入。             ┃" << endl;
+			cout << "┃                                      ┃" << endl;
+			cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+			cin >> input;
+		}
+	}
+
+	if (strcmp(password, input) == 0)
+	{
+		system("cls");
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃          登录成功，欢迎您 ！         ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+	}
+}
+
+void changepassword()//修改密码
+{
+	int kk = 1;
+	char p1[16], p2[16];
+	while (kk) {
+		system("cls");
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃            请输入新密码：            ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+		cin >> p1;
+		cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┃           请重新输入密码：           ┃" << endl;
+		cout << "┃                                      ┃" << endl;
+		cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+		cin >> p2;
+		if (strcmp(p1, p2) != 0)
+		{
+			cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+			cout << "┃                                      ┃" << endl;
+			cout << "┃  两次输入的密码不一致 ，请重新输入。 ┃" << endl;
+			cout << "┃                                      ┃" << endl;
+			cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+		}
+		else
+		{
+			system("cls");
+			cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+			cout << "┃                                      ┃" << endl;
+			cout << "┃       更改密码成功，请重新登录。     ┃" << endl;
+			cout << "┃                                      ┃" << endl;
+			cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+			strcpy_s(password, p1);
+			kk = 0;
+			login();
+		}
+	}
+}
+
+
+int Menu()//菜单
+{
+	while (1)
+	{
+		cout << endl;
+		cout << "      **学生选课信息管理系统**   " << endl;
+		cout << "      ┏━━━━━━━━━━━━━━━━━━━━━┓   " << endl;
+		cout << "      ┃ 请选择功能：        ┃   " << endl;
+		cout << "      ┃ 1.课程信息管理      ┃  " << endl;
+		cout << "      ┃ 2.学生信息管理      ┃  " << endl;
+		cout << "      ┃ 3.修改密码          ┃  " << endl;
+		cout << "      ┃ 4.注销              ┃  " << endl;
+		cout << "      ┃ 5.退出系统          ┃  " << endl;
+		cout << "      ┗━━━━━━━━━━━━━━━━━━━━━┛   " << endl;
+		cout << "      请输入序号（1~5）进入系统操作:  " << endl;
+		cout << endl;
+
+		int ii, k = 1;
+		cin >> ii;
+		while (k)
+		{
+			if (ii > 5 || ii < 1)
+			{
+				cout << "输入错误，请重新输入数字1~5。" << endl;
+				cin >> ii;
+			}
+
+			else
+				k = 0;
+		}
+
+		switch (ii)
+		{
+		case 1: cinfo();break;
+		case 2: sinfo();break;
+		case 3:
+		{
+			changepassword();
+			login();
+			break;
+		}
+		case 4: 
+		{
+			system("cls");
+			cout << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" << endl;
+			cout << "┃                                      ┃" << endl;
+			cout << "┃         注销成功，请重新登录。       ┃" << endl;
+			cout << "┃                                      ┃" << endl;
+			cout << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << endl;
+			login();
+		}
+			break;
+		case 5: return 0;
+			break;
+		}
+	}
+}
+//*****************************************************//
+
+int main()
+{
+	course c1(001, "简明中医", 2, "孙老师");
+	course c2(002, "生活中的时间货币价值", 2, "程老师");
+	course c3(003, "基础会计学", 3, "黄老师");
+	c.push_back(c1);//添加至课程
+	c.push_back(c2);//添加至课程
+	c.push_back(c3);//添加至课程
+	student s1(1, "王小明", "男", "大二", 20);
+	s1.havec.push_back(c1);//添加至学生已选课程
+	s1.havec.push_back(c2);//添加至学生已选课程
+	s.push_back(s1);//添加至学生
+	student s2(2, "李华", "女", "大二", 22);
+	s2.havec.push_back(c2);//添加至学生已选课程
+	s.push_back(s2);//添加至学生
+	login();
+	Menu();
+	system("pause");
+	return 0;
+}
+
